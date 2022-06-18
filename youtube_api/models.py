@@ -14,7 +14,7 @@ class Video(models.Model):
             ),
         ]
 
-    video_id = models.IntegerField()
+    video_id = models.CharField(max_length=50, unique=True)
     video_title = models.CharField(max_length=100)
     published_date_time = models.DateTimeField()
     thumbnail_url = models.URLField(null=True)

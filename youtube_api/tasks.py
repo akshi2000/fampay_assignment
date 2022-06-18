@@ -1,9 +1,9 @@
-from __future__ import absolute_import, unicode_literals
 from celery import shared_task
 import datetime
 from googleapiclient.discovery import build
 import googleapiclient.errors
 
+# from .models import Video
 from config import *
 
 
@@ -14,6 +14,7 @@ def add(x, y):
 
 @shared_task
 def fetch_lastest_youtube_videos():
+    print("EXECUTED")
     api_service_name = "youtube"
     api_version = "v3"
     try:
@@ -23,9 +24,23 @@ def fetch_lastest_youtube_videos():
             developerKey=API_KEY,
         )
 
-        request = youtube.search().list(part="id,snippet")
+        request = youtube.search().list(
+            part="id,snippet",
+            type="video",
+            publishedAfter=PUBLISHED_AFTER_DATE_TIME,
+            order="date",
+            topicId=TOPIC,
+        )
         response = request.execute()
-        print(type(response))
-        print(response)
-    except:
-        print("ERROR")
+        videos = response["items"]
+        for video in videos:
+            snippet = video["snippet"]
+            video_obj = Video()
+            video_obj.video_id = video["id"]["videoId"]
+            video_obj.video_title = snippet["title"]
+            video_obj.thumbnail_url = snippet["thumbnails"]["default"]["url"]
+            video_obj.published_date_time = snippet["publishTime"]
+            video_obj.description = snippet["description"]
+            video_obj.save()
+    except Exception as e:
+        print("ERROR", e)

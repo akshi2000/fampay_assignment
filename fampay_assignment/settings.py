@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "youtube_api.apps.YoutubeApiConfig",
     "rest_framework",
+    "celery",
 ]
 
 MIDDLEWARE = [
@@ -114,6 +115,27 @@ USE_I18N = True
 
 USE_TZ = True
 
+# Celery Config
+CELERY_BROKER_URL = "amqp://localhost:5672"
+CELERY_RESULT_BACKEND = "rpc://"
+CELERY_CACHE_BACKEND = "django-cache"
+CELERY_ACCEPT_CONTENT = ["application/json"]
+CELERY_TASK_SERIALIZER = "json"
+CELERY_RESULT_SERIALIZER = "json"
+CELERY_TIME_ZONE = "Asia/Kolkata"
+
+CELERY_BEAT_SCHEDULE = {
+    "sync-every-10-seconds": {
+        "task": "youtube_api.tasks.fetch_lastest_youtube_videos",
+        "schedule": 10.0,
+        "args": (),
+        "options": {
+            "expires": 5.0,
+        },
+    },
+}
+
+# CELERY_TIMEZONE = "Asia/Kolkata"
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.0/howto/static-files/
