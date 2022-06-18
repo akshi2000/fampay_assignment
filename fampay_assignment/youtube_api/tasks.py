@@ -1,5 +1,4 @@
 from celery import shared_task
-import datetime
 from googleapiclient.discovery import build
 import googleapiclient.errors
 
@@ -39,8 +38,3 @@ def fetch_lastest_youtube_videos():
             video_obj.save()
     except Exception as e:
         print("ERROR", e)
-
-
-@shared_task
-def add(x, y):
-    return x + y

@@ -1,17 +1,11 @@
-from urllib import response
-from django.shortcuts import render, HttpResponse
-from django.http import JsonResponse
 from django.core.paginator import Paginator
 from django.core.serializers import serialize
-import json
-
-from googleapiclient.discovery import build
-import googleapiclient.errors
-
-# from youtube_api.tasks import fetch_lastest_youtube_videos
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
 from config import *
-
 from .models import Video
+
+import json
 
 
 def paginateResponse(query_set, page):
@@ -23,25 +17,23 @@ def paginateResponse(query_set, page):
     page = min(page, pages.num_pages)
     data = json.loads(serialize("json", pages.get_page(page)))
     response = {
-        "firstPage": 1,
         "lastPage": pages.num_pages,
         "pageNumber": page,
-        "nextPage": min(page + 1, pages.num_pages),
-        "previousPage": max(page - 1, 1),
         "numberOfItems": pages.count,
         "items": data,
     }
     return response
 
 
+@api_view(["GET"])
 def getVideoList(request):
-    # fetch_lastest_youtube_videos()
     page = request.GET.get("page")
     query_set = Video.objects.all().order_by("published_date_time")
     response = paginateResponse(query_set, page)
-    return JsonResponse(response, status=200)
+    return Response(response)
 
 
+@api_view(["GET"])
 def searchVideoByTitle(request):
     page = request.GET.get("page")
     title_sub_string = request.GET.get("title")
@@ -49,9 +41,10 @@ def searchVideoByTitle(request):
         "published_date_time"
     )
     response = paginateResponse(query_set, page)
-    return JsonResponse(response, status=200)
+    return Response(response)
 
 
+@api_view(["GET"])
 def searchVideoByDescription(request):
     page = request.GET.get("page")
     description_sub_string = request.GET.get("description")
@@ -59,4 +52,4 @@ def searchVideoByDescription(request):
         description__icontains=description_sub_string
     ).order_by("published_date_time")
     response = paginateResponse(query_set, page)
-    return JsonResponse(response, status=200)
+    return Response(response)
