@@ -11,7 +11,7 @@ Django, DRF, Celery, Redis, Docker
 ## Steps to Setup:
 
 - Clone the repository
-- Run command: `bash sudo docker-compose up -d --build `
+- Run command: ```sudo docker-compose up -d --build ```
 - Access the server at <a href="http://localhost:1337/">localhost:1337</a>
 
 ## API Endpoints:
